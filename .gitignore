@@ -1,1 +1,8 @@
+# --- Virtual Environment ---
 venv/
+
+# --- AUDIO ---
+*.mp3
+
+# --- Cache ---
+__pycache__/*
