@@ -23,9 +23,6 @@ channels = 1
 frames_per_block = int(samplerate * block_duration)
 frames_per_chunk = int(samplerate * chunk_duration)
 
-# --- TYPE ---
-dtype = "float32"
-
 # --- LANGUAGE ---
 language = "en"
 
