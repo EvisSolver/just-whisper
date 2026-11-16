@@ -5,4 +5,4 @@ venv/
 *.mp3
 
 # --- Cache ---
-__pycache__/*
+__pycache__/
