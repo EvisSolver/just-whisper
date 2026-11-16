@@ -1,4 +1,4 @@
-
+import sounddevice as sd
 from config import *
 from pystyle import Colors, Write
 
@@ -9,7 +9,8 @@ print(f"Language from .mp3: {info.language} | proba: {info.language_probability:
 def audio_callback(indata, frames, time, status):
     if status: print(status)
     audio_queue.put(indata.copy()).flatten()
-
+def transcribe_stream():
+    stream = sd.InputStream()
 
 for segment in segments:
     Write.Print(f"{segment.text}", Colors.purple)
