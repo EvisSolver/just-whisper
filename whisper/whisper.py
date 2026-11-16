@@ -16,9 +16,19 @@ def recorder():
     with sd.InputStream(samplerate = samplerate, channels = channels, callback = audio_callback, blocksize = frames_per_block): Write.Print("|", Colors.green, interval = 0)
     while True: sd.sleep(200)
 def transcriber():
-    stream = sd.InputStream(samplerate = samplerate, channels = channels, dtype = dtype)
-    stream.start()
-    buffer = np.array([], dtype = np.float32)
+    global audio_buffer
+    while True:
+        block = audio_queue.get()
+        audio_buffer.append(block)
 
-for segment in segments:
-    Write.Print(f"{segment.text}", Colors.purple)
+        total_frames = sum(len(b) for b in audio_buffer)
+        if total_frames >= frames_per_chunk:
+            audio_data = np.concatenate(audio_buffer)[:frames_per_chunk]
+            audio_buffer = [] # -- Clearing buffer
+
+            audio_data = audio_data.flatten().astype(np.float32)
+
+            segments, _ = model.transcribe(audio_data, language, beam_size)
+            for segment in segments:
+                Write.Print(f"{segment.text}", Colors.purple)
+

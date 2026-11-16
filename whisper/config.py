@@ -12,13 +12,22 @@ audio_buffer = []
 # --- MODEL PARAMETERS ---
 samplerate = 16000
 
+# --- DURATION'S ---
 block_duration = 0.5
 chunk_duration = 2
 
+# --- CHANNEL'S ---
 channels = 1
 
+# --- FRAMES ---
 frames_per_block = samplerate * block_duration
 frames_per_chunk = samplerate * chunk_duration
 
-
+# --- TYPE ---
 dtype = "float32"
+
+# --- LANGUAGE ---
+language = "en"
+
+# SIZE
+beam_size = 4
