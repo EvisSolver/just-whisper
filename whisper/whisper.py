@@ -1,3 +1,4 @@
+import threading
 import numpy as np
 import sounddevice as sd
 
@@ -8,14 +9,16 @@ from pystyle import Colors, Write
 segments, info = model.transcribe("test.mp3", beam_size = 10) # -- >10 - A lot VRAM | <10 - Not a lot VRAM
 print(f"Language from .mp3: {info.language} | proba: {info.language_probability:.2f}")
 
-def audio_callback(indata, frames, time, status):
+# --- AUDIO-CALLBACK ---
+def audio_callback(indata, frames, time, status): # -- Putting indata.copy in audio_queue
     if status: print(status)
     audio_queue.put(indata.copy())
 
-def recorder():
-    with sd.InputStream(samplerate = samplerate, channels = channels, callback = audio_callback, blocksize = frames_per_block): Write.Print("|", Colors.green, interval = 0)
-    while True: sd.sleep(200)
-def transcriber():
+def recorder(): # -- Record audio each 200ms
+    with sd.InputStream(samplerate = samplerate, channels = channels, callback = audio_callback, blocksize = frames_per_block):
+        Write.Print("|", Colors.green, interval = 0)
+        while True: sd.sleep(200)
+def transcriber(): # -- Writting Transcribed text
     global audio_buffer
     while True:
         block = audio_queue.get()
@@ -28,7 +31,9 @@ def transcriber():
 
             audio_data = audio_data.flatten().astype(np.float32)
 
-            segments, _ = model.transcribe(audio_data, language, beam_size)
+            segments, _ = model.transcribe(audio_data, language = language, beam_size = beam_size, vad_filter = True)
             for segment in segments:
                 Write.Print(f"{segment.text}", Colors.purple)
 
+threading.Thread(target = recorder, daemon = True).start() # -- Starting Thread with daemon
+transcriber()
